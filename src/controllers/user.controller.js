@@ -16,6 +16,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // return response
 
   const { username, email, fullName, password } = req.body;
+  const normalizedUsername = username?.toLowerCase();
   if (
     [username, email, fullName, password].some((field) => field?.trim() === '')
   ) {
@@ -24,7 +25,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // add new check for valid email with regex and move on to next
 
   // check if user exists
-  const existedUser = User.findOne({ $or: [{ username }, { email }] });
+  const existedUser = await User.findOne({ $or: [{ username }, { email }] });
   if (existedUser) {
     throw new ApiError(409, 'User already exists');
   }
@@ -36,12 +37,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const avatarResponse = await uploadOnCloudinary(avatarLocalPath);
   const coverImageResponse = await uploadOnCloudinary(coverImageLocalPath);
+
   if (!avatarResponse) {
     throw new ApiError(400, 'Avatar file is required');
   }
 
   const user = await User.create({
-    username: username.toLowercase(),
+    username: normalizedUsername,
     email,
     password,
     fullName,
