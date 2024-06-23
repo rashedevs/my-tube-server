@@ -13,12 +13,15 @@ cloudinary.config({
 
 //uploader function..
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath, name) => {
+  console.log('🚀 ~ uploadOnCloudinary ~ name:', name);
   try {
     if (!localFilePath) return null;
 
     //upoload the file on cloudinary
-    const response = await cloudinary.uploader.upload(localFilePath);
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      public_id: name,
+    });
 
     //file upload successful, so unlink them
     fs.unlinkSync(localFilePath);

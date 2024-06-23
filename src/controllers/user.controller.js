@@ -3,6 +3,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { User } from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import slugifyImageName from '../utils/slugifyImageName.js';
 
 const registerUser = asyncHandler(async (req, res) => {
   // get user info from request
@@ -35,8 +36,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Avatar file is required');
   }
 
-  const avatarResponse = await uploadOnCloudinary(avatarLocalPath);
-  const coverImageResponse = await uploadOnCloudinary(coverImageLocalPath);
+  const avatarResponse = await uploadOnCloudinary(
+    avatarLocalPath,
+    slugifyImageName(req.files?.avatar[0]?.originalname)
+  );
+  const coverImageResponse = await uploadOnCloudinary(
+    coverImageLocalPath,
+    slugifyImageName(req.files?.coverImage[0]?.originalname)
+  );
 
   if (!avatarResponse) {
     throw new ApiError(400, 'Avatar file is required');
